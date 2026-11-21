@@ -29,10 +29,20 @@ namespace MVC_A1.Controllers
         //    else
         //        return NotFound();}
 
+
+        [HttpGet] // BASEURL/Products/DownloadFile
+        public IActionResult DownloadFile()
+        {
+            var bytes = System.IO.File.ReadAllBytes("wwwroot/files/notes.pdf");
+            return new FileContentResult(bytes, "application/pdf");
+        }
+
         //Master action
         //BaseUrl/Products
         //BaseUrl/Products/Index
+
         //[HttpGet]
+
         //public IActionResult Index()
         //{
         // return View();
@@ -55,6 +65,12 @@ namespace MVC_A1.Controllers
         //{
         //    return View();
         //}
+
+        [HttpGet] // BASEURL/Products/RedirectToUrl
+        public IActionResult RedirectToUrl()
+        {
+            return Redirect("https://www.google.com");
+        }
 
         //public IActionResult GetProductById(int id)
         //{
@@ -81,5 +97,78 @@ namespace MVC_A1.Controllers
         //    return File(fileBytes, "application/pdf", "Group01.pdf");
         //}
         #endregion
+
+        #region Routing
+        // الشكل العام: BaseUrl/Controller/Action/Segment
+
+        // أنواع الـ Segment: Static segment, Variable segment, Mixed segment
+
+        // Static   : BaseUrl/Products/Test/Ten      (كلمة ثابتة)
+        // Variable : BaseUrl/Products/Test/{Num}    (قيمة بتتغير)
+        // Mixed    : BaseUrl/Products/Test/x{Num}   (جزء ثابت + جزء بيتغير)
+
+
+        // الـ Param ممكن يجي من: Segment أو Query param
+
+        // BaseUrl/Products/Test?num=10
+
+
+        // BaseUrl/Products/Test01
+        // [HttpGet("Products/Test01")]
+        // public IActionResult TestRouting()
+        // {
+        //     return Json("Hello from testrouting");
+        // }
+
+
+        // BaseUrl/TestingRoute/Test10
+        // [HttpGet("TestingRoute/Test{id:int}")]
+        // public IActionResult TestRouting(int id)
+        // {
+        //     return Json($"Hello with id : {id}");
+        // }
+
+
+        // BaseUrl/Products/TestRouting/10?name=Mariam
+        // الـ id جاي من الـ Segment، والـ name جاي من الـ Query string
+        public IActionResult TestRouting(int id, string name)
+        {
+            return Json($"Hello from TestRouting : id -> {id}, name -> {name}");
+        }
+        #endregion
+
+        #region Model Binding
+        // الـ Action ممكن تاخد Params من نوع:
+        // Simple data, Complex data (كلاس من عندنا), Collection
+
+        // BaseUrl/Products/GetById?id=1&id2=2
+
+        // Simple data
+        [HttpGet]
+        public IActionResult GetById(
+            [FromQuery] int id,
+            [FromQuery(Name = "id2")] int anotherId)   // الاسم في اللينك id2 والمتغير اسمه anotherId
+        {
+            return Json(new { id, anotherId });
+        }
+
+        // Complex data
+        // بتيجي من الـ Query string، وأسماء الـ properties بتتكتب مباشرة
+        // (أو بشكل: اسم الـ param.اسم الـ property)
+        public IActionResult Search(ProductFilter filter)
+        {
+            return Content("Search completed");
+        }
+
+        // Collection
+        // BaseUrl/Products/GetByIds?ids=1&ids=2&ids=3
+        [HttpGet]
+        public IActionResult GetByIds(int[] ids)
+        {
+            return Json(new { ids });
+        }
+        #endregion
+
+
     }
 }
